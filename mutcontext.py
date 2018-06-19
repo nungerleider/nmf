@@ -3,6 +3,12 @@ import sys
 import os
 import glob
 
+''' 
+
+Takes a vcf file (chromosome, position, id, ref, alt, etc in that order) and directory of fastas as input. Prints vcf file with added column for trinucleotide context to standard out.
+
+
+'''
 
 def parse():
 
