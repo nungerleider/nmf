@@ -1,12 +1,10 @@
 # nmf #
 
 ## Requirements ##
-
 Python 3
-Biopython
-
+##Dependencies##
+*Biopython
 ## Usage ##
-
 python mutcontext.py vcf_file genome_dir
 
 
