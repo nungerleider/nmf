@@ -8,21 +8,28 @@ def rcomp(seq):
     dna = {'A': 'T', 'C': 'G', 'T': 'A', 'G':'C'}
     return ''.join(reversed([dna[i.upper()] if i.upper() in dna else 'X' for i in seq]))
 
+''' 
+
+Takes a vcf file (chromosome, position, id, ref, alt, etc in that order) and directory of fastas as input. Prints vcf file with added column for trinucleotide context to standard out.
+
+
+'''
 
 def parse():
 
     script_name = os.path.basename(sys.argv.pop(0))
 
-    helpmsg = "\n\tUsage: {script} vcf_file genome_directory\n".format(script=script_name) 
-    helpmsg += "genome_directory must contain individual fasta files for each chromosome."
+    helpmsg = "\nUsage: {script} vcf_file genome_directory\n".format(script=script_name) 
+    helpmsg += "\ngenome_directory must contain individual fasta files for each chromosome."
     helpmsg += " i.e. 'chr1.fa', 'chr2.fa', etc. Or '1.fa', '2.fa'; as long as the text up until the '.fa' matches"
-    helpmsg += " the chromosome names in the vcf file."
+    helpmsg += " the chromosome names in the vcf file.\n"
 
-    if sys.argv[1] in ['-h', '--help']:
-        sys.exit(helpmsg)
 
-    if len(sys.argv) < 2: 
+    if len(sys.argv) < 2:
         print("\nYou need to supply at least two arguments..a vcf file and a directory (containing genome fasta files.)\n")
+        sys.exit(helpmsg)
+    
+    if sys.argv[1] in ['-h', '--help']:
         sys.exit(helpmsg)
 
     vcf = sys.argv.pop(0)
@@ -50,6 +57,7 @@ def process_vcf(vcf, genome_dir):
                 continue
 
             chromosome, position, _, ref, alt, *_ = line.split('\t')
+            position = int(position)
             if chromosome != c_init:
                 c_init = chromosome
                 try:
