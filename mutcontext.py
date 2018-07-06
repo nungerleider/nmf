@@ -3,10 +3,15 @@ import sys
 import os
 import glob
 
+def rcomp(seq):
+    
+    dna = {'A': 'T', 'C': 'G', 'T': 'A', 'G':'C'}
+    return ''.join(reversed([dna[i.upper()] if i.upper() in dna else 'X' for i in seq]))
+
 
 def parse():
 
-    script_name = os.path.basename(sys.argv[0].pop(0))
+    script_name = os.path.basename(sys.argv.pop(0))
 
     helpmsg = "\n\tUsage: {script} vcf_file genome_directory\n".format(script=script_name) 
     helpmsg += "genome_directory must contain individual fasta files for each chromosome."
@@ -16,7 +21,7 @@ def parse():
     if sys.argv[1] in ['-h', '--help']:
         sys.exit(helpmsg)
 
-    if len(sys.argv) < 2 
+    if len(sys.argv) < 2: 
         print("\nYou need to supply at least two arguments..a vcf file and a directory (containing genome fasta files.)\n")
         sys.exit(helpmsg)
 
@@ -26,7 +31,7 @@ def parse():
 
     genome_dir = sys.argv.pop(0)
 
-    fastas = glob.glob(os.path.join(genome_dir,'/*fa'))
+    fastas = glob.glob(os.path.join(genome_dir,'*fa'))
     if not fastas:
         sys.exit("No fasta files found in your genome directory: %s" % genome_dir) 
 
@@ -51,10 +56,18 @@ def process_vcf(vcf, genome_dir):
                     loaded_fa = SeqIO.read(os.path.join(genome_dir, c_init + '.fa'), 'fasta')
                 except: 
                     sys.exit("%s not found or not in the proper format" % c_init)
-
+            position = int(position)
+            if len(ref) != 1 or len(alt) != 1:
+                print(line)
+                continue
             subseq = str(loaded_fa[position - 2: position + 1].seq).upper()
+            if ref in 'GA':
+                ref = rcomp(ref)
+                alt = rcomp(alt)
+                subseq = rcomp(subseq)
+            mutation = "{ref}>{alt}-{subseq}".format(ref=ref, alt=alt, subseq=subseq)
 
-            line += '\t%s' % subseq
+            line += '\t%s' % mutation
             print(line)
 
 
